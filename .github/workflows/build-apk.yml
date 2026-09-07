@@ -13,11 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Zip ဖိုင်ကို အလိုအလျောက် ဖြည်ထုတ်ခြင်း
-      - name: Unzip project file
-        run: |
-          unzip -o "invokersyny-prompt-builder (1).zip"
-
       - name: Set up Java JDK
         uses: actions/setup-java@v4
         with:
@@ -31,18 +26,23 @@ jobs:
           channel: 'stable'
           cache: true
 
-      - name: Install dependencies
+      # Root ပေါ်ရှိ main.dart ကို lib/main.dart ဖြစ်အောင် တည်ဆောက်ပေးခြင်း
+      - name: Organize Flutter structure
         run: |
-          cd flutter_project
-          flutter pub get
+          mkdir -p lib
+          if [ -f "main.dart" ]; then
+            mv main.dart lib/main.dart
+          fi
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build APK
-        run: |
-          cd flutter_project
-          flutter build apk --release
+        run: flutter build apk --release
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: invokersyny-release-apk
-          path: flutter_project/build/app/outputs/flutter-apk/app-release.apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+
