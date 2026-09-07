@@ -1,0 +1,50 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  workflow_dispatch: # ခလုတ်နှိပ်ပြီး ကိုယ်တိုင် build စတင် run နိုင်စေရန်
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Code များကို Checkout လုပ်ခြင်း
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Java (JDK 17) Setup လုပ်ခြင်း
+      - name: Set up Java JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      # 3. Flutter Setup လုပ်ခြင်း
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.x'
+          channel: 'stable'
+          cache: true
+
+      # 4. Dependency များ ရယူခြင်း
+      - name: Install dependencies
+        run: |
+          cd flutter_project
+          flutter pub get
+
+      # 5. Release APK တည်ဆောက်ခြင်း
+      - name: Build APK
+        run: |
+          cd flutter_project
+          flutter build apk --release
+
+      # 6. ထွက်လာသော APK ဖိုင်ကို GitHub မှ Download ဆွဲနိုင်ရန် Upload တင်ခြင်း
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: invokersyny-release-apk
+          path: flutter_project/build/app/outputs/flutter-apk/app-release.apk
+          
