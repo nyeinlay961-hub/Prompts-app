@@ -26,7 +26,6 @@ jobs:
           channel: 'stable'
           cache: true
 
-      # လိုအပ်သော Android Gradle ဖိုင်များကို auto-generate ပြုလုပ်ပြီး code ထည့်သွင်းခြင်း
       - name: Recreate Android Flutter Scaffold
         run: |
           mkdir -p ../temp_code
@@ -36,68 +35,7 @@ jobs:
           elif [ -f "main.dart" ]; then
             cp main.dart ../temp_code/
           fi
-          
-          # Flutter project အပြည့်အစုံကို လက်ရှိ directory ထဲတွင် recreate လုပ်ခြင်း
           flutter create . --org com.invokersyny --project-name invokersyny_prompt_builder
-          
-          # မူလ code များကို ပြန်လည် အစားထိုးခြင်း
-          cp ../temp_code/pubspec.yaml ./pubspec.yaml
-          cp ../temp_code/main.dart ./lib/main.dart
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build APK
-        run: flutter build apk --release
-
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: invokersyny-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-name: Build Android APK
-
-on:
-  push:
-    branches: [ "main", "master" ]
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.24.x'
-          channel: 'stable'
-          cache: true
-
-      # လိုအပ်သော Android Gradle ဖိုင်များကို auto-generate ပြုလုပ်ပြီး code ထည့်သွင်းခြင်း
-      - name: Recreate Android Flutter Scaffold
-        run: |
-          mkdir -p ../temp_code
-          cp pubspec.yaml ../temp_code/ || true
-          if [ -f "lib/main.dart" ]; then
-            cp lib/main.dart ../temp_code/
-          elif [ -f "main.dart" ]; then
-            cp main.dart ../temp_code/
-          fi
-          
-          # Flutter project အပြည့်အစုံကို လက်ရှိ directory ထဲတွင် recreate လုပ်ခြင်း
-          flutter create . --org com.invokersyny --project-name invokersyny_prompt_builder
-          
-          # မူလ code များကို ပြန်လည် အစားထိုးခြင်း
           cp ../temp_code/pubspec.yaml ./pubspec.yaml
           cp ../temp_code/main.dart ./lib/main.dart
 
